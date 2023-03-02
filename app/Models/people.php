@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class people extends Model
+class People extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -21,7 +21,7 @@ class people extends Model
         'nationality',
     ];
 
-    // public function phones() {
-    //     return $this->belongsToMany(Phones::class);
-    // }
+    public function phones() {
+        return $this->belongsToMany(Phones::class);
+    }
 }

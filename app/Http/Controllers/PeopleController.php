@@ -51,11 +51,11 @@ class PeopleController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'nullable|string|max:100',
-            'cpf' => 'nullable|string|max:20',
-            'email' => 'nullable|string|max:50',
-            'date_birth' => 'nullable|string|max:10',
-            'nationality' => 'nullable|string|max:20'
+            'name' => 'required|string|max:100',
+            'cpf' => 'required|string|max:20',
+            'email' => 'required|string|max:50',
+            'date_birth' => 'required|string|max:10',
+            'nationality' => 'required|string|max:20'
         ]);
         
         $people = [
