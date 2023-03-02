@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Phones extends Model
 {
     use HasFactory;
-    protected $table = 'phone';
+    protected $table = 'phones';
 
     protected $fillable = [
         'phone',
         'people_id',
     ];
 
-    public function peoples() {
-        return $this->belongsToMany(People::class);
+    public function people() {
+        return $this->hasOne(People::class);
     }
 }

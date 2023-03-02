@@ -14,10 +14,5 @@ use App\Http\Controllers\PeopleController;
 |
 */
 
-Route::get('/people', [PeopleController::class, 'indexpeople'])->name('people');
-Route::get('/newpeople', [PeopleController::class, 'createpeople'])->name('newpeople');
-Route::post('/newpeople-store', [PeopleController::class, 'storepeople'])->name('storepeople');
-Route::get('/people-show/{id}', [PeopleController::class, 'showpeople'])->name('showpeople');
-Route::get('/people-edit/{id}', [PeopleController::class, 'editpeople'])->name('editpeople');
-Route::put('/people-update/{id}', [PeopleController::class, 'updatepeople'])->name('updatepeople');
-Route::delete('/people-delete/{id}', [PeopleController::class, 'deletepeople'])->name('deletepeople');
+Route::resource('/people', PeopleController::class);
+

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PeopleRequest;
 use App\Models\People;
+use App\Models\Phones;
 use Illuminate\Http\Request;
 
 class PeopleController extends Controller
@@ -14,21 +16,19 @@ class PeopleController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->all();
-        
+
         $people = People::where(function($query) use($request){
             if(isset($request->search)){
                 $query = $query->where('name', 'like', "%".$request->search."%");
             }
-                        
+
             if(isset($request->duration)){
                 $query = $query->where('duration', $request->duration);
             }
 
-        })->paginate(50);
-          
-        return view ('people.index', compact('people', 'search'))
-            ->with('i', (request()->input('page', 1) - 1) * 50);
+        })->get()->toJson();
+
+        return  response()->json($people, 200);
 
     }
 
@@ -48,28 +48,24 @@ class PeopleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PeopleRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:100',
-            'cpf' => 'required|string|max:20',
-            'email' => 'required|string|max:50',
-            'date_birth' => 'required|string|max:10',
-            'nationality' => 'required|string|max:20'
-        ]);
-        
-        $people = [
-            'name' => $request->name,
-            'cpf' => $request->cpf,
-            'email' => $request->email,
-            'date_birth' => $request->date_birth,
-            'nationality' => $request->nationality
-        ];
-        
-        People::create($people);
 
-        return redirect()->route('people')
-                   ->with('success','Pessoa criada com sucesso.');
+        $requestData = $request->validated();
+        unset($requestData['phones']);
+
+        $people = People::create($requestData);
+
+        if($request->phones){
+            $phones = array();
+            foreach($request->phones as $phone){
+                array_push($phones,new Phones(["phone" => $phone, "people_id" => $people->id]));
+            }
+
+            $people->phones()->saveMany($phones);
+        }
+
+        return  response()->json(["message" => "pessoa criada com sucesso"], 201);
     }
 
     /**
@@ -109,7 +105,7 @@ class PeopleController extends Controller
     {
         $cadastro = $request->all();
         $id = $cadastro['id'];
-        
+
         $request->validate([
             'name' => 'nullable|string|max:100',
             'cpf' => 'nullable|string|max:20',
@@ -140,8 +136,8 @@ class PeopleController extends Controller
      */
     public function destroy($id)
     {
-        $people = People::find($id);
-        $people->delete();
+        Phones::where('people_id', $id)->delete();
+       People::where('id', $id)->delete();
 
         return redirect()->route('people')
                         ->with('success','Pessoa excluída com sucesso.');
